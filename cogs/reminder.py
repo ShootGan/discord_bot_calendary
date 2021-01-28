@@ -6,14 +6,14 @@ class Reminder(commands.Cog):
 
     def __init__(self, client):
         self.client = client
-
+    ##Events
     @commands.Cog.listener()
     async def on_ready(self):
         print('bot is ready')
-
-    @comands.comand(name='planowanie sesji',help=' Po komendziej podaj: nazwa grupa data godzina')
-        def async sesja(self,ctx,*,sesja_parm )
-            await ctx.send(x)
+    ##Commands
+    @commands.command()
+    async def sesja(self,ctx,*,sesja_parm):
+        await ctx.send(sesja_parm)
 
 def setup(client):
     client.add_cog(Reminder(client))
