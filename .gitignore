@@ -3,3 +3,4 @@ starybot.py
 token.txt
 Pipfile
 discord_bot.code-workspace
+/Pipfile.lock
