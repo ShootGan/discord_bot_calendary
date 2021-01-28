@@ -1,9 +1,10 @@
 import discord
 from discord.ext import commands
-from token_r import read_token
+from token_r import start_functions11
 from cogs.reminder import Reminder
 client = commands.Bot(command_prefix='!')
-TOKEN= read_token()
+TOKEN= start_functions.read_token()
 if __name__ == '__main__':
+    start_functions.create_table()
     client.add_cog(Reminder(client))
     client.run(TOKEN)
