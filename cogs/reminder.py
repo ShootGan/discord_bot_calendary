@@ -1,7 +1,17 @@
 import discord
-#import pandas as pd
+import pandas as pd
 from discord.ext import commands
 from token_r import read_token
+
+
+def create_table():
+    kolumnny = ['nazwa', 'grupa', 'data', 'godzina']
+    data_table = pd.DataFrame(columns=kolumnny)
+    return data_table
+
+
+Data_table = create_table()
+print(Data_table)
 def add_new_sesion(wejscie):
     wejscie = wejscie.split()
     x=1
