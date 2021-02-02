@@ -1,8 +1,10 @@
 import os
 from datetime import datetime
 
+import discord
 import pymongo
 from discord.ext import commands
+from tomark import Tomark
 
 base_key = os.getenv('DBKEY')
 my_db_name = os.getenv('DBNAME')
@@ -12,6 +14,7 @@ mydb = client[my_db_name]
 mycol = mydb[mycol_name]
 
 
+##Add new sesion
 def add_new_sesion(data):
     groups = {'G1': 'Gracze I', 'G2': 'Gracze II', 'G3': 'Gracze III', 'G4': 'Gracze IV'}
 
@@ -47,6 +50,33 @@ def add_new_sesion(data):
     return ('Sesja dodana! :D')
 
 
+# Show all sesions
+def show_all_sesions():
+    sesions_list = list(mycol.find({'date': {"$gt": datetime.now()}}, {'_id': 0, 'remebers': 0}))
+    sesions_list = Tomark.table(sesions_list)
+    print(sesions_list)
+    return sesions_list
+
+
+# Find given sesions
+def find_my_sesions(group):
+    try:
+        groups = {'G1': 'Gracze I', 'G2': 'Gracze II', 'G3': 'Gracze III', 'G4': 'Gracze IV'}
+        group = groups[group]
+    except Exception as err:
+        print(err)
+        return ('zła grupa')
+    print(group)
+    try:
+        your_sesions_list = list(
+            mycol.find({'date': {"$gt": datetime.now()}, "group": group}, {"_id": 0, 'remebers': 0}))
+        your_sesions_list = Tomark.table(your_sesions_list)
+    except Exception as err:
+        print(err)
+        return ('nie masz żadnych sesji przegrywie')
+    return your_sesions_list
+
+
 class Reminder(commands.Cog):
 
     def __init__(self, client):
@@ -58,11 +88,29 @@ class Reminder(commands.Cog):
         print('bot is ready')
 
     ##Commands
+    ##Make new sesion
     @commands.command()
     async def sesja(self, ctx, *, sesja_parm):
         print(sesja_parm)
         response = (add_new_sesion(sesja_parm))
         await ctx.send(response)
+
+    ##Show all sesions
+    @commands.command()
+    async def sesje(self, ctx):
+        response = (show_all_sesions())
+        embed = discord.Embed()
+        embed.add_field(name="*Sesje*", value=response, inline=False)
+        await ctx.send(embed=embed)
+
+        ##Show all sesions
+
+    @commands.command()
+    async def moje(self, ctx, *, group):
+        response = (find_my_sesions(group))
+        embed = discord.Embed()
+        embed.add_field(name="Twoje sesje:", value=response, inline=False)
+        await ctx.send(embed=embed)
 
 
 def setup(client):
