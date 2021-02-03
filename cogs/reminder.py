@@ -4,7 +4,6 @@ from datetime import datetime
 import discord
 import pymongo
 from discord.ext import commands
-from tomark import Tomark
 
 base_key = os.getenv('DBKEY')
 my_db_name = os.getenv('DBNAME')
@@ -52,8 +51,8 @@ def add_new_sesion(data):
 
 # Show all sesions
 def show_all_sesions():
-    sesions_list = list(mycol.find({'date': {"$gt": datetime.now()}}, {'_id': 0, 'remebers': 0}))
-    sesions_list = Tomark.table(sesions_list)
+    sesions_list = list(mycol.find({'date': {"$gt": datetime.now()}}, {'_id': 0, 'remebers': 0}).sort('date'))
+    # sesions_list = Tomark.table(sesions_list)
     print(sesions_list)
     return sesions_list
 
@@ -69,8 +68,8 @@ def find_my_sesions(group):
     print(group)
     try:
         your_sesions_list = list(
-            mycol.find({'date': {"$gt": datetime.now()}, "group": group}, {"_id": 0, 'remebers': 0}))
-        your_sesions_list = Tomark.table(your_sesions_list)
+            mycol.find({'date': {"$gt": datetime.now()}, "group": group}, {"_id": 0, 'remebers': 0}).sort('date'))
+
     except Exception as err:
         print(err)
         return ('nie masz żadnych sesji przegrywie')
@@ -99,8 +98,13 @@ class Reminder(commands.Cog):
     @commands.command()
     async def sesje(self, ctx):
         response = (show_all_sesions())
-        embed = discord.Embed()
-        embed.add_field(name="*Sesje*", value=response, inline=False)
+        embed = discord.Embed(title="Wszystkie sesje:")
+        for x in response:
+            timeto = str(abs(x['date'] - datetime.now())).split(".")[0]
+
+            print(timeto)
+            embed.add_field(name=x['date'], value='**Nazwa:** ' + x['name'] + '\n' + '**Grupa:** ' + x[
+                'group'] + '\n' + '**Za:** ' + timeto, inline=False)
         await ctx.send(embed=embed)
 
         ##Show all sesions
@@ -108,8 +112,13 @@ class Reminder(commands.Cog):
     @commands.command()
     async def moje(self, ctx, *, group):
         response = (find_my_sesions(group))
-        embed = discord.Embed()
-        embed.add_field(name="Twoje sesje:", value=response, inline=False)
+        embed = discord.Embed(title="Wybrane sesje:")
+        for x in response:
+            timeto = str(abs(x['date'] - datetime.now())).split(".")[0]
+
+            print(timeto)
+            embed.add_field(name=x['date'], value='**Nazwa:** ' + x['name'] + '\n' + '**Za:** ' + timeto, inline=False)
+
         await ctx.send(embed=embed)
 
 
