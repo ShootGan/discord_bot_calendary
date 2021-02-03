@@ -1,9 +1,10 @@
 import os
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import discord
 import pymongo
-from discord.ext import commands
+from discord.ext import commands, tasks
+from discord.utils import get
 
 base_key = os.getenv('DBKEY')
 my_db_name = os.getenv('DBNAME')
@@ -75,18 +76,44 @@ def find_my_sesions(group):
         return ('nie masz żadnych sesji przegrywie')
     return your_sesions_list
 
-
 class Reminder(commands.Cog):
 
-    def __init__(self, client):
-        self.client = client
+    def __init__(self, bot):
+        self.bot = bot
+
+
 
     ##Events
     @commands.Cog.listener()
     async def on_ready(self):
+        self.send_notification.start()
         print('bot is ready')
 
+
+        # tasks
+    @tasks.loop(minutes=1)
+    async def send_notification(self):
+        channel = self.bot.get_channel(704695378838290462)
+        minusdate = datetime.now() + timedelta(days=1)
+        mention = {'Gracze I': '<@&806275258725957702>', 'Gracze II': '<@&806275316682063943>',
+                   'Gracze III': '<@&806275354783383574>', 'Gracze IV': '<@&806275451676655666>'}
+        for x in mycol.find({'date': {"$lt": minusdate}}):
+
+            if x['date'] < (datetime.now() + timedelta(days=1)) and x['remebers'] == 0:
+
+                await channel.send(mention[x['group']]+" Jutro sesja")
+                mycol.update_one({'_id': x['_id']}, {"$set": {"remebers": 1}})
+            elif x['date'] < (datetime.now() + timedelta(minutes=30)) and x['remebers'] == 1:
+
+                await channel.send(mention[x['group']]+ " 30 minut do grania")
+                mycol.update_one({'_id': x['_id']}, {"$set": {"remebers": 2}})
+            elif x['date'] < datetime.now() and x['remebers'] == 2:
+
+                await channel.send(mention[x['group']] + " Sesjaaaaa!")
+                mycol.delete_one({"_id": x['_id']})
+
     ##Commands
+
     ##Make new sesion
     @commands.command()
     async def sesja(self, ctx, *, sesja_parm):
