@@ -5,7 +5,10 @@ import discord
 import pymongo
 from discord.ext import commands, tasks
 import random
+import discord.utils
+
 import time
+
 base_key = os.getenv('DBKEY')
 my_db_name = os.getenv('DBNAME')
 mycol_name = os.getenv('DBCOL')
@@ -76,6 +79,7 @@ def find_my_sesions(group):
         return ('nie masz żadnych sesji przegrywie')
     return your_sesions_list
 
+
 # dice
 def dice(x):
     try:
@@ -91,6 +95,23 @@ def dice(x):
         return wynik, suma
     except:
         return ("coś źle wpisałeś mordeczko ;)"), ':(('
+
+
+def gawena(content):
+    jesienna = ['jesiennej', 'jesienna', 'jesieną', 'jesienną']
+    gawenda = ['gawenda', 'gawende', 'gawendy', 'gawęda', 'gawendy', 'gawędę', 'gawęde', 'gawęde?', 'gawędę?']
+    lubie = ['lubie', 'lubię', 'uwielbiam', 'kocham', 'jestem', 'fanem', 'pasja', 'pograć', 'pograł', 'pograli',
+             'fajna', 'kox', 'super', 'lubuje', 'luba', 'kochulma', 'koham', 'chciałbym ruchać', 'chcialbym ruchać',
+             'kochać', "uprawiać", 'seks']
+    if any(jesien in content for jesien in jesienna):
+        if any(gawend in content for gawend in gawenda):
+            if any(like in content for like in lubie):
+                print("o ty chuju")
+                return 1
+    else:
+        return 0
+
+
 class Reminder(commands.Cog):
 
     def __init__(self, bot):
@@ -102,11 +123,30 @@ class Reminder(commands.Cog):
         self.send_notification.start()
         print('bot is ready')
 
+    # jesienna gawenda addon
+    @commands.Cog.listener()  ##nie lubimy takich
+    async def on_message(self, message):
+
+        message_content = message.content.strip().lower()
+        if gawena(message_content) == 1:
+            typ = message.author
+            print(typ)
+            teksty = ['Jebać jesienną gawendę', 'Dumny ty jesteś człowieku z tego co robisz?',
+                      'Nawet ja nie dopuściłbym się czegoś takiego', 'Na Sigmara, dajcie tu ognia ']
+            conte = random.choice(teksty)
+            embed = discord.Embed()
+            embed.set_author(name="Gosperd Behn ",
+                             icon_url="https://static.wikia.nocookie.net/warhammerfb/images/2/25/Witch_Hunter_Generic.jpg/revision/latest/scale-to-width-down/340?cb=20170120024902")
+            embed.add_field(name=typ, value=conte, inline=False)
+
+            await message.channel.send(embed=embed)
+
         # tasks
 
     @tasks.loop(minutes=1)
     async def send_notification(self):
         channel = self.bot.get_channel(704695378838290462)
+
         minusdate = datetime.now() + timedelta(days=1)
         mention = {'Gracze I': '<@&806275258725957702>', 'Gracze II': '<@&806275316682063943>',
                    'Gracze III': '<@&806275354783383574>', 'Gracze IV': '<@&806275451676655666>'}
@@ -162,12 +202,13 @@ class Reminder(commands.Cog):
         await ctx.send(embed=embed)
 
     @commands.command()  ##kostka
-    async def r(self,ctx, *, x):
+    async def r(self, ctx, *, x):
         elements, end = dice(x)
         embed = discord.Embed(title="Kostka co nie oszukuje:")
-        embed.add_field(name='Wyniki: ',value= elements, inline=False)
-        embed.add_field(name='Suma: ',value= end, inline=False)
+        embed.add_field(name='Wyniki: ', value=elements, inline=False)
+        embed.add_field(name='Suma: ', value=end, inline=False)
         await ctx.send(embed=embed)
+
 
 def setup(client):
     client.add_cog(Reminder(client))
