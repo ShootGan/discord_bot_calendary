@@ -4,7 +4,8 @@ from datetime import datetime, timedelta
 import discord
 import pymongo
 from discord.ext import commands, tasks
-
+import random
+import time
 base_key = os.getenv('DBKEY')
 my_db_name = os.getenv('DBNAME')
 mycol_name = os.getenv('DBCOL')
@@ -75,7 +76,21 @@ def find_my_sesions(group):
         return ('nie masz żadnych sesji przegrywie')
     return your_sesions_list
 
-
+# dice
+def dice(x):
+    try:
+        y = x
+        y = y.split("d")
+        rzuty = y[0]
+        ilosc = y[1]
+        wynik = []
+        suma = 0
+        for z in range(int(rzuty)):
+            wynik.append(random.randint(1, int(ilosc)))
+            suma = suma + wynik[z]
+        return wynik, suma
+    except:
+        return ("coś źle wpisałeś mordeczko ;)"), ':(('
 class Reminder(commands.Cog):
 
     def __init__(self, bot):
@@ -146,6 +161,13 @@ class Reminder(commands.Cog):
 
         await ctx.send(embed=embed)
 
+    @commands.command()  ##kostka
+    async def r(self,ctx, *, x):
+        elements, end = dice(x)
+        embed = discord.Embed(title="Kostka co nie oszukuje:")
+        embed.add_field(name='Wyniki: ',value= elements, inline=False)
+        embed.add_field(name='Suma: ',value= end, inline=False)
+        await ctx.send(embed=embed)
 
 def setup(client):
     client.add_cog(Reminder(client))
