@@ -102,7 +102,7 @@ def gawena(content):
     gawenda = ['gawenda', 'gawende', 'gawendy', 'gawęda', 'gawendy', 'gawędę', 'gawęde', 'gawęde?', 'gawędę?']
     lubie = ['lubie', 'lubię', 'uwielbiam', 'kocham', 'jestem', 'fanem', 'pasja', 'pograć', 'pograł', 'pograli',
              'fajna', 'kox', 'super', 'lubuje', 'luba', 'kochulma', 'koham', 'chciałbym ruchać', 'chcialbym ruchać',
-             'kochać', "uprawiać", 'seks']
+             'kochać', "uprawiać", 'seks', 'pyte']
     if any(jesien in content for jesien in jesienna):
         if any(gawend in content for gawend in gawenda):
             if any(like in content for like in lubie):
@@ -110,6 +110,22 @@ def gawena(content):
                 return 1
     else:
         return 0
+
+
+def delete_session(data):
+    data = data.split()
+    print(data)
+    try:
+        date = data[1] + ' ' + data[2] + ':00'
+        date = datetime.strptime(date, '%d/%m/%y %H:%M:%S')
+
+    except Exception as err:
+        print(err)
+        return ('źle podałeś date albo godzinę byq')
+    print(data[0])
+    delete_this = mycol.find_one({'date': date,'name':data[0]}, { 'remebers': 0})
+    mycol.delete_one({"_id": delete_this['_id']})
+    return  'usniete'
 
 
 class Reminder(commands.Cog):
@@ -132,7 +148,8 @@ class Reminder(commands.Cog):
             typ = message.author
             print(typ)
             teksty = ['Jebać jesienną gawendę', 'Dumny ty jesteś człowieku z tego co robisz?',
-                      'Nawet ja nie dopuściłbym się czegoś takiego', 'Na Sigmara, dajcie tu ognia ']
+                      'Nawet ja nie dopuściłbym się czegoś takiego', 'Na Sigmara, dajcie tu ognia ', 'O kruca',
+                      'Sigmarze ześlij na niego kometę']
             conte = random.choice(teksty)
             embed = discord.Embed()
             embed.set_author(name="Gosperd Behn ",
@@ -145,11 +162,11 @@ class Reminder(commands.Cog):
 
     @tasks.loop(minutes=1)
     async def send_notification(self):
-        channel = self.bot.get_channel(704695378838290462)
+        channel = self.bot.get_channel(807716288675577908)
 
         minusdate = datetime.now() + timedelta(days=1)
-        mention = {'Gracze I': '<@&806275258725957702>', 'Gracze II': '<@&806275316682063943>',
-                   'Gracze III': '<@&806275354783383574>', 'Gracze IV': '<@&806275451676655666>'}
+        mention = {'Gracze I': '<@&491289891854876673>', 'Gracze II': '<@&647474242924970015>',
+                   'Gracze III': '<@&681480093150871624>', 'Gracze IV': '<@&686997723358036053>'}
         for x in mycol.find({'date': {"$lt": minusdate}}):
 
             if x['date'] < (datetime.now() + timedelta(days=1)) and x['remebers'] == 0:
@@ -207,6 +224,25 @@ class Reminder(commands.Cog):
         embed = discord.Embed(title="Kostka co nie oszukuje:")
         embed.add_field(name='Wyniki: ', value=elements, inline=False)
         embed.add_field(name='Suma: ', value=end, inline=False)
+        await ctx.send(embed=embed)
+
+    @commands.command()
+    async def usuns(self,ctx,*,x):
+        response = delete_session(x)
+        await ctx.send(response)
+
+
+
+
+    @commands.command()  ##help
+    async def sesjahelp(self, ctx):
+        embed = discord.Embed(title="Komendy: ", description="bocik do sesji")
+        embed.add_field(name="!sesja nazwa grupa data godzina",
+                        value="tworzy nową sesję, nazwa nie może mieć spacji. grupy G1 do G4 data: dd/mm/rr godzina: hh/mm ",
+                        inline=False)
+        embed.add_field(name="!sesje", value="pokazuje wszystkie sesje", inline=False)
+        embed.add_field(name="!moje  grupa", value="pokazuje sesje danej grupy ", inline=True)
+        embed.add_field(name="!r (liczba)d(liczba)", value="kostka i tyle ", inline=True)
         await ctx.send(embed=embed)
 
 
