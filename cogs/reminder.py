@@ -123,9 +123,9 @@ def delete_session(data):
         print(err)
         return ('źle podałeś date albo godzinę byq')
     print(data[0])
-    delete_this = mycol.find_one({'date': date,'name':data[0]}, { 'remebers': 0})
+    delete_this = mycol.find_one({'date': date, 'name': data[0]}, {'remebers': 0})
     mycol.delete_one({"_id": delete_this['_id']})
-    return  'usniete'
+    return 'usniete'
 
 
 class Reminder(commands.Cog):
@@ -185,14 +185,14 @@ class Reminder(commands.Cog):
     ##Commands
 
     ##Make new sesion
-    @commands.command()
+    @commands.command(name='sesja', help='Dodaje sejse, nazwa grupa dd/mm/rr hh:mm.')
     async def sesja(self, ctx, *, sesja_parm):
         print(sesja_parm)
         response = (add_new_sesion(sesja_parm))
         await ctx.send(response)
 
     ##Show all sesions
-    @commands.command()
+    @commands.command(name='sesje', help='Pokazuje wszystkie sesje.')
     async def sesje(self, ctx):
         response = (show_all_sesions())
         embed = discord.Embed(title="Wszystkie sesje:")
@@ -206,7 +206,7 @@ class Reminder(commands.Cog):
 
         ##Show all sesions
 
-    @commands.command()
+    @commands.command(name='moje sesje', help='Pokazuje sesje danej drużyny, po spacji kod drużyny')
     async def moje(self, ctx, *, group):
         response = (find_my_sesions(group))
         embed = discord.Embed(title="Wybrane sesje:")
@@ -218,7 +218,7 @@ class Reminder(commands.Cog):
 
         await ctx.send(embed=embed)
 
-    @commands.command()  ##kostka
+    @commands.command(name='kostka', help='r 1d10')  ##kostka
     async def r(self, ctx, *, x):
         elements, end = dice(x)
         embed = discord.Embed(title="Kostka co nie oszukuje:")
@@ -226,15 +226,12 @@ class Reminder(commands.Cog):
         embed.add_field(name='Suma: ', value=end, inline=False)
         await ctx.send(embed=embed)
 
-    @commands.command()
-    async def usuns(self,ctx,*,x):
+    @commands.command(name='usuń sesje', help='usuwa sesje, nazwa sesji data')
+    async def usuns(self, ctx, *, x):
         response = delete_session(x)
         await ctx.send(response)
 
-
-
-
-    @commands.command()  ##help
+    @commands.command(name='wewnetrzny help', help='w sumie juz zbędny')  ##help
     async def sesjahelp(self, ctx):
         embed = discord.Embed(title="Komendy: ", description="bocik do sesji")
         embed.add_field(name="!sesja nazwa grupa data godzina",
