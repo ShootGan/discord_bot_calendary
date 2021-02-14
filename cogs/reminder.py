@@ -253,6 +253,7 @@ class Reminder(commands.Cog):
         embed.add_field(name="!sesje", value="pokazuje wszystkie sesje", inline=False)
         embed.add_field(name="!moje  grupa", value="pokazuje sesje danej grupy ", inline=True)
         embed.add_field(name="!r (liczba)d(liczba)", value="kostka i tyle ", inline=True)
+        embed.add_field(name="!usuns (nazwa) (dd/mm/rr hh:mm)", value="usuwa sesje ", inline=True)
         await ctx.send(embed=embed)
 
 
