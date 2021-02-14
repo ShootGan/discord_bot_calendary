@@ -186,7 +186,7 @@ class Reminder(commands.Cog):
     async def actually_cal(self):
         channel = self.bot.get_channel(807716288675577908)
 
-        messageid = 810519866259931166
+        messageid = 810630268716974121
         response = (show_all_sesions())
         embed = discord.Embed(title="Aktualny kalendarz:")
         for x in response:
