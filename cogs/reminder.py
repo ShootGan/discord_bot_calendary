@@ -46,7 +46,7 @@ def add_new_sesion(data):
     }
     try:
         x = mycol.insert_one(data_col)
-        print(x.inserted_id)
+
     except Exception as err:
         print(err)
         return ('Błąd bazy danych')
@@ -57,7 +57,7 @@ def add_new_sesion(data):
 def show_all_sesions():
     sesions_list = list(mycol.find({'date': {"$gt": datetime.now()}}, {'_id': 0, 'remebers': 0}).sort('date'))
     # sesions_list = Tomark.table(sesions_list)
-    print(sesions_list)
+
     return sesions_list
 
 
@@ -69,7 +69,7 @@ def find_my_sesions(group):
     except Exception as err:
         print(err)
         return ('zła grupa')
-    print(group)
+
     try:
         your_sesions_list = list(
             mycol.find({'date': {"$gt": datetime.now()}, "group": group}, {"_id": 0, 'remebers': 0}).sort('date'))
@@ -106,7 +106,6 @@ def gawena(content):
     if any(jesien in content for jesien in jesienna):
         if any(gawend in content for gawend in gawenda):
             if any(like in content for like in lubie):
-                print("o ty chuju")
                 return 1
     else:
         return 0
@@ -114,7 +113,7 @@ def gawena(content):
 
 def delete_session(data):
     data = data.split()
-    print(data)
+
     try:
         date = data[1] + ' ' + data[2] + ':00'
         date = datetime.strptime(date, '%d/%m/%y %H:%M:%S')
@@ -122,7 +121,7 @@ def delete_session(data):
     except Exception as err:
         print(err)
         return ('źle podałeś date albo godzinę byq')
-    print(data[0])
+
     delete_this = mycol.find_one({'date': date, 'name': data[0]}, {'remebers': 0})
     mycol.delete_one({"_id": delete_this['_id']})
     return 'usniete'
@@ -137,6 +136,7 @@ class Reminder(commands.Cog):
     @commands.Cog.listener()
     async def on_ready(self):
         self.send_notification.start()
+        self.actually_cal.start()
         print('bot is ready')
 
     # jesienna gawenda addon
@@ -146,7 +146,7 @@ class Reminder(commands.Cog):
         message_content = message.content.strip().lower()
         if gawena(message_content) == 1:
             typ = message.author
-            print(typ)
+
             teksty = ['Jebać jesienną gawendę', 'Dumny ty jesteś człowieku z tego co robisz?',
                       'Nawet ja nie dopuściłbym się czegoś takiego', 'Na Sigmara, dajcie tu ognia ', 'O kruca',
                       'Sigmarze ześlij na niego kometę']
@@ -182,12 +182,27 @@ class Reminder(commands.Cog):
                 await channel.send(mention[x['group']] + " Sesjaaaaa!")
                 mycol.delete_one({"_id": x['_id']})
 
+    @tasks.loop(minutes=30)
+    async def actually_cal(self):
+        channel = self.bot.get_channel(807716288675577908)
+
+        messageid = 810519866259931166
+        response = (show_all_sesions())
+        embed = discord.Embed(title="Aktualny kalendarz:")
+        for x in response:
+            timeto = str(abs(x['date'] - datetime.now())).split(".")[0]
+
+            embed.add_field(name=x['date'], value='**Nazwa:** ' + x['name'] + '\n' + '**Grupa:** ' + x[
+                'group'] + '\n' + '**Za:** ' + timeto, inline=False)
+        msg = await channel.fetch_message(messageid)
+        await msg.edit(embed=embed)
+
     ##Commands
 
     ##Make new sesion
     @commands.command(name='sesja', help='Dodaje sejse, nazwa grupa dd/mm/rr hh:mm.')
     async def sesja(self, ctx, *, sesja_parm):
-        print(sesja_parm)
+
         response = (add_new_sesion(sesja_parm))
         await ctx.send(response)
 
@@ -199,7 +214,6 @@ class Reminder(commands.Cog):
         for x in response:
             timeto = str(abs(x['date'] - datetime.now())).split(".")[0]
 
-            print(timeto)
             embed.add_field(name=x['date'], value='**Nazwa:** ' + x['name'] + '\n' + '**Grupa:** ' + x[
                 'group'] + '\n' + '**Za:** ' + timeto, inline=False)
         await ctx.send(embed=embed)
@@ -213,7 +227,6 @@ class Reminder(commands.Cog):
         for x in response:
             timeto = str(abs(x['date'] - datetime.now())).split(".")[0]
 
-            print(timeto)
             embed.add_field(name=x['date'], value='**Nazwa:** ' + x['name'] + '\n' + '**Za:** ' + timeto, inline=False)
 
         await ctx.send(embed=embed)
