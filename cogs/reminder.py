@@ -220,7 +220,7 @@ class Reminder(commands.Cog):
 
         ##Show all sesions
 
-    @commands.command(name='moje sesje', help='Pokazuje sesje danej drużyny, po spacji kod drużyny')
+    @commands.command(name='moje', help='Pokazuje sesje danej drużyny, po spacji kod drużyny')
     async def moje(self, ctx, *, group):
         response = (find_my_sesions(group))
         embed = discord.Embed(title="Wybrane sesje:")
@@ -231,7 +231,7 @@ class Reminder(commands.Cog):
 
         await ctx.send(embed=embed)
 
-    @commands.command(name='kostka', help='r 1d10')  ##kostka
+    @commands.command(name='r', help='r 1d10')  ##kostka
     async def r(self, ctx, *, x):
         elements, end = dice(x)
         embed = discord.Embed(title="Kostka co nie oszukuje:")
@@ -239,12 +239,12 @@ class Reminder(commands.Cog):
         embed.add_field(name='Suma: ', value=end, inline=False)
         await ctx.send(embed=embed)
 
-    @commands.command(name='usuń sesje', help='usuwa sesje, nazwa sesji data')
+    @commands.command(name='usuns', help='usuwa sesje, nazwa sesji data')
     async def usuns(self, ctx, *, x):
         response = delete_session(x)
         await ctx.send(response)
 
-    @commands.command(name='wewnetrzny help', help='w sumie juz zbędny')  ##help
+    @commands.command(name='sesjahelp', help='w sumie juz zbędny')  ##help
     async def sesjahelp(self, ctx):
         embed = discord.Embed(title="Komendy: ", description="bocik do sesji")
         embed.add_field(name="!sesja nazwa grupa data godzina",
@@ -254,6 +254,7 @@ class Reminder(commands.Cog):
         embed.add_field(name="!moje  grupa", value="pokazuje sesje danej grupy ", inline=True)
         embed.add_field(name="!r (liczba)d(liczba)", value="kostka i tyle ", inline=True)
         embed.add_field(name="!usuns (nazwa) (dd/mm/rr hh:mm)", value="usuwa sesje ", inline=True)
+
         await ctx.send(embed=embed)
 
 
