@@ -5,8 +5,8 @@ Simple discord bot build with python and Mongo DB that reminds you about some ev
 If u wanna make it better, fork it and pull the request :D.
 ___
 ## Shortcuts:
-* [Polski](#-Discord-Callendar-Bot )
-* [English](#-Discord-Callendar-Bot )
+* [Polski](#-Polski )
+* [English](#-English )
 ___
 # Polski
 ___
